@@ -1,0 +1,962 @@
+{
+  "video1.mp4": {
+    "segments": {
+      "0.266933-0.867533": {
+        "start_time": 0.266933,
+        "end_time": 0.867533,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "underwater",
+          "water"
+        ]
+      },
+      "0.9009-3.136466": {
+        "start_time": 0.9009,
+        "end_time": 3.136466,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "sea turtle",
+          "turtle",
+          "underwater",
+          "water"
+        ]
+      },
+      "3.169833-3.937266": {
+        "start_time": 3.169833,
+        "end_time": 3.937266,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "underwater",
+          "water"
+        ]
+      }
+    }
+  },
+  "video2.mp4": {
+    "segments": {
+      "0.266933-4.437766": {
+        "start_time": 0.266933,
+        "end_time": 4.437766,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "stony coral",
+          "underwater",
+          "water"
+        ]
+      },
+      "4.471133-6.740066": {
+        "start_time": 4.471133,
+        "end_time": 6.740066,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      }
+    }
+  },
+  "video3.mp4": {
+    "segments": {
+      "0.266933-2.4024": {
+        "start_time": 0.266933,
+        "end_time": 2.4024,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "2.435766-8.742066": {
+        "start_time": 2.435766,
+        "end_time": 8.742066,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "geological phenomenon",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "pomacentridae",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      }
+    }
+  },
+  "video4.mp4": {
+    "segments": {
+      "0.266933-39.706333": {
+        "start_time": 0.266933,
+        "end_time": 39.706333,
+        "labels": [
+          "algae",
+          "animal",
+          "aquanaut",
+          "buoyancy compensator",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "divemaster",
+          "diving",
+          "diving equipment",
+          "dry suit",
+          "fish",
+          "forage fish",
+          "freediving",
+          "green algae",
+          "herring",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "ocean",
+          "organism",
+          "outdoor recreation",
+          "person",
+          "recreation",
+          "reef",
+          "scuba diving",
+          "sea",
+          "shoal",
+          "snorkeling",
+          "stony coral",
+          "underwater",
+          "underwater diving",
+          "water"
+        ]
+      },
+      "39.7397-42.075366": {
+        "start_time": 39.7397,
+        "end_time": 42.075366,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "shoal",
+          "stony coral",
+          "underwater"
+        ]
+      }
+    }
+  },
+  "video5.mp4": {
+    "segments": {
+      "0.266933-1.234566": {
+        "start_time": 0.266933,
+        "end_time": 1.234566,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "1.267933-3.737066": {
+        "start_time": 1.267933,
+        "end_time": 3.737066,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "3.770433-6.773433": {
+        "start_time": 3.770433,
+        "end_time": 6.773433,
+        "labels": [
+          "algae",
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "6.8068-13.146466": {
+        "start_time": 6.8068,
+        "end_time": 13.146466,
+        "labels": [
+          "aquanaut",
+          "coral",
+          "coral reef",
+          "divemaster",
+          "diving",
+          "diving equipment",
+          "dry suit",
+          "freediving",
+          "marine biology",
+          "natural environment",
+          "nature",
+          "organism",
+          "recreation",
+          "reef",
+          "scuba diving",
+          "underwater",
+          "underwater diving",
+          "water"
+        ]
+      },
+      "13.179833-14.1141": {
+        "start_time": 13.179833,
+        "end_time": 14.1141,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "underwater",
+          "water"
+        ]
+      },
+      "14.147466-19.452766": {
+        "start_time": 14.147466,
+        "end_time": 19.452766,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater",
+          "water"
+        ]
+      },
+      "19.486133-22.4224": {
+        "start_time": 19.486133,
+        "end_time": 22.4224,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "shoal",
+          "stony coral",
+          "underwater",
+          "water"
+        ]
+      },
+      "22.455766-22.589233": {
+        "start_time": 22.455766,
+        "end_time": 22.589233,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      }
+    }
+  },
+  "video6.mp4": {
+    "segments": {
+      "0.266933-0.367033": {
+        "start_time": 0.266933,
+        "end_time": 0.367033,
+        "labels": []
+      },
+      "0.4004-1.267933": {
+        "start_time": 0.4004,
+        "end_time": 1.267933,
+        "labels": [
+          "animal",
+          "coral",
+          "coral reef",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "1.3013-2.5025": {
+        "start_time": 1.3013,
+        "end_time": 2.5025,
+        "labels": [
+          "animal",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "2.535866-7.374033": {
+        "start_time": 2.535866,
+        "end_time": 7.374033,
+        "labels": [
+          "animal",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "7.4074-9.776433": {
+        "start_time": 7.4074,
+        "end_time": 9.776433,
+        "labels": [
+          "animal",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "9.8098-11.978633": {
+        "start_time": 9.8098,
+        "end_time": 11.978633,
+        "labels": [
+          "animal",
+          "coral",
+          "coral reef",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "12.012-12.946266": {
+        "start_time": 12.012,
+        "end_time": 12.946266,
+        "labels": [
+          "animal",
+          "coral",
+          "coral reef",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "12.979633-14.180833": {
+        "start_time": 12.979633,
+        "end_time": 14.180833,
+        "labels": [
+          "animal",
+          "coral",
+          "coral reef",
+          "electric ray",
+          "fish",
+          "giant clam",
+          "marine biology",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      }
+    }
+  },
+  "video7.mp4": {
+    "segments": {
+      "0.266933-2.268933": {
+        "start_time": 0.266933,
+        "end_time": 2.268933,
+        "labels": [
+          "animal",
+          "brain coral",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "2.3023-3.336666": {
+        "start_time": 2.3023,
+        "end_time": 3.336666,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "3.370033-4.671333": {
+        "start_time": 3.370033,
+        "end_time": 4.671333,
+        "labels": [
+          "animal",
+          "brain coral",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "4.7047-14.748066": {
+        "start_time": 4.7047,
+        "end_time": 14.748066,
+        "labels": [
+          "animal",
+          "brain coral",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      }
+    }
+  },
+  "video8.mp4": {
+    "segments": {
+      "0.266933-10.2102": {
+        "start_time": 0.266933,
+        "end_time": 10.2102,
+        "labels": [
+          "animal",
+          "cnidaria",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "sponge",
+          "stony coral",
+          "underwater"
+        ]
+      }
+    }
+  },
+  "video9.mp4": {
+    "segments": {
+      "0.266933-5.672333": {
+        "start_time": 0.266933,
+        "end_time": 5.672333,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "underwater"
+        ]
+      },
+      "5.7057-7.2739329999999995": {
+        "start_time": 5.7057,
+        "end_time": 7.2739329999999995,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "underwater"
+        ]
+      },
+      "7.3073-9.175833": {
+        "start_time": 7.3073,
+        "end_time": 9.175833,
+        "labels": [
+          "animal",
+          "coral",
+          "coral reef",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "underwater"
+        ]
+      },
+      "9.2092-22.288933": {
+        "start_time": 9.2092,
+        "end_time": 22.288933,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "nature",
+          "organism",
+          "reef",
+          "sea",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "22.3223-23.690333": {
+        "start_time": 22.3223,
+        "end_time": 23.690333,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "underwater"
+        ]
+      },
+      "23.7237-26.092733": {
+        "start_time": 23.7237,
+        "end_time": 26.092733,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "stony coral",
+          "underwater",
+          "water"
+        ]
+      },
+      "26.1261-27.160466": {
+        "start_time": 26.1261,
+        "end_time": 27.160466,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "27.193833-31.998633": {
+        "start_time": 27.193833,
+        "end_time": 31.998633,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "32.032-33.5335": {
+        "start_time": 32.032,
+        "end_time": 33.5335,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "33.566866-35.068366": {
+        "start_time": 33.566866,
+        "end_time": 35.068366,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "35.101733-36.036": {
+        "start_time": 35.101733,
+        "end_time": 36.036,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "36.069366-38.671966": {
+        "start_time": 36.069366,
+        "end_time": 38.671966,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "marine invertebrates",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "38.705333-40.7407": {
+        "start_time": 38.705333,
+        "end_time": 40.7407,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "40.774066-41.8418": {
+        "start_time": 40.774066,
+        "end_time": 41.8418,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "sea turtle",
+          "stony coral",
+          "underwater"
+        ]
+      },
+      "41.875166-43.576866": {
+        "start_time": 41.875166,
+        "end_time": 43.576866,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "coral reef fish",
+          "fish",
+          "hawksbill sea turtle",
+          "invertebrate",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "sea turtle",
+          "stony coral",
+          "turtle",
+          "underwater"
+        ]
+      },
+      "43.610233-45.812433": {
+        "start_time": 43.610233,
+        "end_time": 45.812433,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "organism",
+          "reef",
+          "sea",
+          "sea turtle",
+          "stony coral",
+          "turtle",
+          "underwater"
+        ]
+      },
+      "45.8458-46.780066": {
+        "start_time": 45.8458,
+        "end_time": 46.780066,
+        "labels": [
+          "animal",
+          "coastal and oceanic landforms",
+          "coral",
+          "coral reef",
+          "fish",
+          "marine biology",
+          "natural environment",
+          "ocean",
+          "organism",
+          "reef",
+          "sea",
+          "sea turtle",
+          "stony coral",
+          "turtle",
+          "underwater"
+        ]
+      }
+    }
+  }
+}

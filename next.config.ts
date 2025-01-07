@@ -1,7 +1,23 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  reactStrictMode: false,  // Disable strict mode in development
+  webpack: (config) => {
+    // Reduce hot reloading overhead
+    config.watchOptions = {
+      poll: false,
+      ignored: ['**/node_modules', '**/.git']
+    }
+    return config
+  },
+  // Optimize image handling
+  images: {
+    domains: ['localhost'],
+    unoptimized: true
+  },
+  // Reduce development overhead
+  swcMinify: true,
+  poweredByHeader: false
+}
 
-export default nextConfig;
+export default nextConfig
