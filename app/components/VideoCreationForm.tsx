@@ -35,7 +35,6 @@ export default function VideoCreationForm() {
     moodTone: 'Calm',
     genre: 'Alternative',
     orderPreference: 'AI-determined',
-    excludedContent: '',
     audioOption: 'No Audio',
     spotifyTrack: '',
     uploadedVideos: [] as File[],
@@ -210,117 +209,6 @@ export default function VideoCreationForm() {
 
   return (
     <div className="min-h-screen relative">
-      <div className="fixed inset-0 overflow-hidden z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900/50 to-purple-900/50"></div>
-        
-        {[...Array(5)].map((_, i) => (
-          <motion.div
-            key={i}
-            className={`absolute inset-0 opacity-20`}
-            animate={{
-              y: [-20, 20],
-              scaleY: [0.8, 1.2],
-            }}
-            transition={{
-              duration: 3 + i,
-              repeat: Infinity,
-              repeatType: "reverse",
-              ease: "easeInOut",
-              delay: i * 0.3,
-            }}
-          >
-            <div 
-              className="h-[200px] w-full absolute top-1/2 transform -translate-y-1/2"
-              style={{
-                background: `linear-gradient(90deg, 
-                  transparent 0%,
-                  ${i % 2 ? 'rgba(147, 51, 234, 0.3)' : 'rgba(59, 130, 246, 0.3)'} 50%,
-                  transparent 100%)`,
-                filter: 'blur(40px)',
-              }}
-            />
-          </motion.div>
-        ))}
-
-        {[...Array(10)].map((_, i) => (
-          <motion.div
-            key={`particle-${i}`}
-            className="absolute w-4 h-4 rounded-full bg-white/10"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [-20, 20],
-              x: [-20, 20],
-              scale: [0.8, 1.2],
-              opacity: [0.3, 0.6],
-            }}
-            transition={{
-              duration: 4 + Math.random() * 6,
-              repeat: Infinity,
-              repeatType: "reverse",
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-
-        <div className="absolute inset-0 opacity-5">
-          <div className="h-full w-full bg-[url('/filmstrip-pattern.svg')] bg-repeat bg-[length:100px_100px] animate-slide"></div>
-        </div>
-
-
-
-        <motion.div
-          animate={{
-            rotate: [0, 10, -10, 0],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-20 right-40"
-        >
-          <svg
-            className="w-24 h-24 text-white"
-            viewBox="0 0 32 32"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              x="4"
-              y="8"
-              width="16"
-              height="12"
-              rx="2"
-              ry="2"
-              fill="currentColor"
-            />
-           
-            <circle cx="20" cy="14" r="4" fill="currentColor" />
-            <circle cx="20" cy="14" r="2.5" fill="black" />
-            
-            <circle cx="8" cy="10" r="1.5" fill="red" />
-    
-            <rect
-              x="22"
-              y="10"
-              width="2"
-              height="8"
-              rx="1"
-              ry="1"
-              fill="currentColor"
-            />
-          
-          </svg>
-        </motion.div>
-        
-
-        <div className="absolute top-1/4 -left-10 w-40 h-40 bg-blue-500/30 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 -right-10 w-40 h-40 bg-purple-500/30 rounded-full blur-3xl"></div>
-          
-      </div>
-
       <div className="relative z-10">
         <div className="text-center mb-12">
           <h1 className="text-6xl font-extrabold">
@@ -339,6 +227,7 @@ export default function VideoCreationForm() {
         {(isProcessing || isMusicLoading) && (
           <LoadingOverlay message={loadingMessage || 'Getting music recommendations...'} />
         )}
+        
         <Card className="bg-white/90 backdrop-blur-lg border-gray-200/50 rounded-xl overflow-hidden shadow-2xl">
           <CardContent className="p-6">
             <form onSubmit={handleSubmit}>
@@ -396,13 +285,6 @@ export default function VideoCreationForm() {
                     value={formData.orderPreference}
                     onChange={handleInputChange}
                     options={["Chronological", "AI-determined"]}
-                  />
-                  <TextInput
-                    label="Excluded Content"
-                    name="excludedContent"
-                    value={formData.excludedContent}
-                    onChange={handleInputChange}
-                    placeholder="Example: Violence, inappropriate content, blurry footage"
                   />
                 </TabsContent>
                 <TabsContent value="audio" className="space-y-6">
