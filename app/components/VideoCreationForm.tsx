@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
@@ -47,6 +47,9 @@ export default function VideoCreationForm() {
   const [musicError, setMusicError] = useState('')
   const [isMusicLoading, setIsMusicLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('')
+  const [showError, setShowError] = useState(false)
+
+  const videoPlayerRef = useRef<HTMLDivElement>(null)
 
   const handleInputChange = (name: string, value: any) => {
     setFormData((prev) => {
@@ -93,7 +96,7 @@ export default function VideoCreationForm() {
     setIsProcessing(true);
     setLoadingMessage('Creating your video...');
     setError('');
-    // Clear existing video before starting new generation
+    setShowError(false);
     setGeneratedVideoUrl('');
 
     try {
@@ -143,6 +146,14 @@ export default function VideoCreationForm() {
       // Set new video URL which will trigger re-render of VideoPlayer
       setGeneratedVideoUrl(data.video_url)
       
+      // Add this scroll behavior after setting the video URL
+      setTimeout(() => {
+        videoPlayerRef.current?.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'center'
+        })
+      }, 100)
+
       // Log audio analysis results if available
       if (data.audioAnalysis) {
         console.log('Audio analysis results:', data.audioAnalysis)
@@ -152,8 +163,10 @@ export default function VideoCreationForm() {
       }
 
     } catch (error) {
-      console.error('Error:', error)
-      setError(error instanceof Error ? error.message : 'An error occurred while creating the video.')
+      console.error('Error:', error);
+      setError(error instanceof Error ? error.message : 'An error occurred while creating the video.');
+      setShowError(true);
+      setTimeout(() => setShowError(false), 5000);
     } finally {
       setIsProcessing(false);
       setLoadingMessage('');
@@ -316,7 +329,11 @@ export default function VideoCreationForm() {
                   />
                 </TabsContent>
               </Tabs>
-              {error && <p className="text-red-500 mt-4">{error}</p>}
+              {error && showError && (
+                <p className="text-red-500 mt-4 transition-opacity duration-300">
+                  {error}
+                </p>
+              )}
               <div className="mt-8 flex justify-center">
                 <TooltipProvider>
                   <Tooltip>
@@ -332,7 +349,15 @@ export default function VideoCreationForm() {
                 </TooltipProvider>
               </div>
             </form>
-            {generatedVideoUrl && <VideoPlayer key={generatedVideoUrl} videoUrl={generatedVideoUrl} isOutput={true} />}
+            {generatedVideoUrl && (
+              <div ref={videoPlayerRef}>
+                <VideoPlayer 
+                  key={generatedVideoUrl} 
+                  videoUrl={generatedVideoUrl} 
+                  isOutput={true} 
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
