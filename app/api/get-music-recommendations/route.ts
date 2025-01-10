@@ -12,8 +12,7 @@ export async function POST(request: Request): Promise<Response> {
         'backend/music_recommender.py',
         JSON.stringify({
           contentFocus: data.contentFocus,
-          keyLabels: data.keyLabels,
-          style: data.style,
+          genre: data.genre,
           mood: data.mood,
           duration: data.duration
         })

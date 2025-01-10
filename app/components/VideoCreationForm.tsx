@@ -32,7 +32,8 @@ export default function VideoCreationForm() {
     contentFocus: '',
     keyLabels: '',
     stylePreference: 'Smooth/Cinematic',
-    moodTone: 'Chill',
+    moodTone: 'Calm',
+    genre: 'Alternative',
     orderPreference: 'AI-determined',
     excludedContent: '',
     audioOption: 'No Audio',
@@ -93,6 +94,8 @@ export default function VideoCreationForm() {
     setIsProcessing(true);
     setLoadingMessage('Creating your video...');
     setError('');
+    // Clear existing video before starting new generation
+    setGeneratedVideoUrl('');
 
     try {
       // Debug log to check the files
@@ -138,6 +141,7 @@ export default function VideoCreationForm() {
         throw new Error(data.message || 'Failed to create video')
       }
 
+      // Set new video URL which will trigger re-render of VideoPlayer
       setGeneratedVideoUrl(data.video_url)
       
       // Log audio analysis results if available
@@ -407,7 +411,14 @@ export default function VideoCreationForm() {
                     name="moodTone"
                     value={formData.moodTone}
                     onChange={handleInputChange}
-                    options={["Chill", "Commute", "Energy Boosters", "Feel Good", "Focus", "Party", "Romance", "Sad", "Workout"]}
+                    options={["Calm", "Chill", "Commute", "Energy Boosters", "Feel Good", "Party", "Romance", "Sad", "Workout"]}
+                  />
+                  <DropdownInput
+                    label="Music Genre"
+                    name="genre"
+                    value={formData.genre}
+                    onChange={handleInputChange}
+                    options={["Alternative", "Blues", "Bollywood", "Classical", "Country", "Electronic", "Folk", "Funk", "Hip-hop", "Indie", "Instrumental", "Jazz", "Latin", "Metal", "Pop", "Punk", "Rap", "Reggae", "Rock", "Soul", "World"]}
                   />
                   <SpotifyInput
                     value={formData.spotifyTrack}
@@ -439,7 +450,7 @@ export default function VideoCreationForm() {
                 </TooltipProvider>
               </div>
             </form>
-            {generatedVideoUrl && <VideoPlayer videoUrl={generatedVideoUrl} />}
+            {generatedVideoUrl && <VideoPlayer key={generatedVideoUrl} videoUrl={generatedVideoUrl} isOutput={true} />}
           </CardContent>
         </Card>
       </div>

@@ -9,9 +9,12 @@ from datetime import datetime
 import subprocess
 from collections import defaultdict
 from pathlib import Path
+from google.oauth2 import service_account
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from tenacity import retry, stop_after_attempt, wait_exponential
+import tempfile
 
 # Your VideoSegment and VideoAnalyzer classes here
-# (The code you provided) 
 @dataclass
 class VideoSegment:
     """Stores comprehensive segment information"""
@@ -27,7 +30,7 @@ class VideoSegment:
 class VideoAnalyzer:
     def __init__(self, data_dir: Path):
         self.data_dir = data_dir
-        self.results_file = data_dir / 'video_analysis_results.json'
+        self.results_file = data_dir / 'video_analysis_results1.json'
         self.client = videointelligence.VideoIntelligenceServiceClient()
         self.features = [
             videointelligence.Feature.LABEL_DETECTION,
@@ -38,17 +41,93 @@ class VideoAnalyzer:
             videointelligence.Feature.FACE_DETECTION
         ]
         print("Initialized VideoAnalyzer with features:", self.features)
+        self.max_dimension = 720  # Set maximum video dimension
+        self.target_filesize_mb = 100  # Target file size in MB
 
+    def preprocess_video(self, video_path: str) -> str:
+        """Preprocess video to optimize size while maintaining quality"""
+        try:
+            # Create temp file
+            temp_dir = tempfile.mkdtemp()
+            output_path = os.path.join(temp_dir, f"processed_{os.path.basename(video_path)}")
+            
+            # Get video information
+            probe = subprocess.run([
+                'ffprobe',
+                '-v', 'error',
+                '-select_streams', 'v:0',
+                '-show_entries', 'stream=width,height,duration',
+                '-of', 'json',
+                video_path
+            ], capture_output=True, text=True)
+            
+            video_info = json.loads(probe.stdout)
+            stream = video_info['streams'][0]
+            
+            # Calculate scaling with even dimensions
+            width = int(stream.get('width', 1920))
+            height = int(stream.get('height', 1080))
+            scale_factor = min(self.max_dimension / max(width, height), 1)
+            new_width = int(width * scale_factor)
+            new_height = int(height * scale_factor)
+            
+            # Ensure dimensions are even
+            new_width = new_width - (new_width % 2)
+            new_height = new_height - (new_height % 2)
+            
+            # Compress video while maintaining reasonable quality
+            subprocess.run([
+                'ffmpeg',
+                '-i', video_path,
+                '-vf', f'scale={new_width}:{new_height}',
+                '-c:v', 'libx264',
+                '-crf', '28',  # Compression quality (23-28 is good range)
+                '-preset', 'medium',  # Encoding speed preset
+                '-c:a', 'aac',
+                '-b:a', '128k',
+                '-y',  # Overwrite output file if it exists
+                output_path
+            ], check=True)
+            
+            return output_path
+            
+        except Exception as e:
+            print(f"Error preprocessing video {video_path}: {str(e)}")
+            return video_path
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10),
+        reraise=True
+    )
     def analyze_video(self, video_path: str):
         """Analyze a single video file"""
         try:
             print(f"\nAnalyzing video: {video_path}")
-            # Ensure the video path exists
             if not os.path.exists(video_path):
                 print(f"Error: Video file not found at {video_path}")
                 return None
 
-            with open(video_path, 'rb') as file:
+            # Preprocess video before analysis
+            processed_video_path = self.preprocess_video(video_path)
+            print(f"Preprocessed video saved to: {processed_video_path}")
+
+            # Get video duration using ffprobe
+            probe = subprocess.run([
+                'ffprobe', 
+                '-v', 'error',
+                '-show_entries', 'format=duration',
+                '-of', 'default=noprint_wrappers=1:nokey=1',
+                processed_video_path
+            ], capture_output=True, text=True)
+            
+            duration = float(probe.stdout.strip())
+            
+            # Calculate timeout based on video duration (with a minimum of 20 minutes)
+            timeout_seconds = max(2400, int(duration * 3))  # 3x video duration or minimum 20 minutes
+            print(f"Setting timeout to {timeout_seconds} seconds for {duration} second video")
+
+            with open(processed_video_path, 'rb') as file:
                 input_content = file.read()
             
 
@@ -68,7 +147,7 @@ class VideoAnalyzer:
                 shot_change_detection_config=shot_config
             )
 
-            # Start the asynchronous request
+            # Start the asynchronous request with increased timeout
             operation = self.client.annotate_video(
                 request={
                     "features": self.features,
@@ -77,15 +156,23 @@ class VideoAnalyzer:
                 }
             )
 
-            print(f"Processing video {video_path}...")
-            result = operation.result(timeout=600)  # 10-minute timeout
+            print(f"Processing video {processed_video_path}...")
+            result = operation.result(timeout=2400)
             return result
 
         except Exception as e:
-            print(f"Analysis error for {video_path}: {str(e)}")
+            print(f"Analysis error for {processed_video_path}: {str(e)}")
             import traceback
             traceback.print_exc()
             return None
+        finally:
+            # Cleanup temporary processed video if it exists
+            if 'processed_video_path' in locals() and processed_video_path != video_path:
+                try:
+                    os.remove(processed_video_path)
+                    os.rmdir(os.path.dirname(processed_video_path))
+                except:
+                    pass
 
     def process_results(self, result, video_path: str) -> Dict:
         """Process analysis results into a structured format"""
@@ -182,49 +269,57 @@ class VideoAnalyzer:
             traceback.print_exc()
             return {"segments": [], "duration": 0, "file_name": os.path.basename(video_path)}
 
-    def analyze_videos_batch(self, video_paths: List[str]) -> None:
-        """Analyze multiple videos and save results"""
-        print(f"Starting batch analysis of {len(video_paths)} videos")
+    def analyze_videos_batch(self, video_paths: List[str], max_workers: int = 3, progress_callback=None) -> None:
+        """Analyze multiple videos in parallel and save results"""
+        if progress_callback:
+            progress_callback(f"Starting analysis of {len(video_paths)} videos")
+
+        print(f"Starting parallel batch analysis of {len(video_paths)} videos with {max_workers} workers")
         print(f"Video paths to analyze: {video_paths}")
-        ### remove this if code for huggingface spaces
-        # Check if analysis results already exist
+
+        # Check existing results
+        existing_results = {}
         if os.path.exists(self.results_file):
             try:
                 with open(self.results_file, 'r') as f:
                     existing_results = json.load(f)
-                    
-                # Check if all videos are already analyzed
-                all_analyzed = all(
-                    os.path.basename(path) in existing_results 
-                    for path in video_paths
-                )
-                
-                if all_analyzed:
-                    print(f"Found existing analysis results at {self.results_file}")
-                    print("Using cached results instead of re-analyzing videos")
-                    return
-                else:
-                    print("Some videos not found in existing results, proceeding with analysis")
+                print(f"Found existing analysis results at {self.results_file}")
             except Exception as e:
                 print(f"Error reading existing results: {e}")
-                print("Proceeding with fresh analysis")
-        
-        # Proceed with analysis if needed
-        analysis_results = {}
-        for video_path in video_paths:
-            # Convert to string if it's a Path object
-            video_path = str(video_path)
-            print(f"Processing: {video_path}")
-            
-            # Check if file exists
-            if not os.path.exists(video_path):
-                print(f"Error: File not found - {video_path}")
-                continue
-                
-            results = self.analyze_video(video_path)
-            if results:
-                file_name = os.path.basename(video_path)
-                analysis_results[file_name] = self.process_results(results, video_path)
+
+        # Filter out already analyzed videos
+        videos_to_analyze = [
+            path for path in video_paths 
+            if os.path.basename(str(path)) not in existing_results
+        ]
+
+        if not videos_to_analyze:
+            print("All videos already analyzed. Using cached results.")
+            return
+
+        print(f"Analyzing {len(videos_to_analyze)} new videos")
+        analysis_results = existing_results.copy()
+
+        # Process videos in parallel
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_video = {
+                executor.submit(self.analyze_video, str(video_path)): video_path 
+                for video_path in videos_to_analyze
+            }
+
+            # Process completed tasks as they finish
+            for future in as_completed(future_to_video):
+                video_path = future_to_video[future]
+                try:
+                    results = future.result()
+                    if results:
+                        file_name = os.path.basename(str(video_path))
+                        analysis_results[file_name] = self.process_results(results, str(video_path))
+                        if progress_callback:
+                            progress_callback(f"Completed analysis for: {file_name}")
+                except Exception as e:
+                    if progress_callback:
+                        progress_callback(f"Analysis failed for {video_path}: {str(e)}")
 
         # Save results to file
         print(f"Saving results for {len(analysis_results)} videos")

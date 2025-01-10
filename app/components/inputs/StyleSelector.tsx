@@ -18,7 +18,11 @@ export default function StyleSelector({ label, name, value, onChange, options }:
           <Button
             key={option}
             variant={value === option ? 'default' : 'ghost'}
-            onClick={() => onChange(name, option)}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              onChange(name, option)
+            }}
             className={`h-24 flex flex-col items-center justify-center text-center p-2 ${
               value === option
                 ? 'bg-electric-blue hover:bg-electric-blue-dark text-white'

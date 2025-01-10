@@ -2,7 +2,7 @@
 
 import { Button } from '../ui/button'
 import { Play, Download } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface VideoPlayerProps {
   videoUrl: string
@@ -11,25 +11,33 @@ interface VideoPlayerProps {
 
 export default function VideoPlayer({ videoUrl, isOutput = false }: VideoPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false)
+  const [key, setKey] = useState(Date.now())
   const fullVideoUrl = videoUrl.startsWith('http') 
     ? videoUrl 
-    : `http://127.0.0.1:5000${videoUrl}`
+    : `http://127.0.0.1:5000${videoUrl}?t=${key}`
+
+  useEffect(() => {
+    setIsPlaying(false)
+    setKey(Date.now())
+  }, [videoUrl])
 
   console.log('Video URL:', fullVideoUrl)
 
   return (
     <div className="mt-8 space-y-4">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">
+      <h2 className="text-purple-400 flex items-center gap-2 text-xl font-bold mb-3 tracking-wide">
         {isOutput ? "Generated Video" : "Your Reel"}
       </h2>
       <div className="relative aspect-w-16 aspect-h-9 bg-gray-100 rounded-lg overflow-hidden group">
         <video 
+          key={key}
           className="w-full h-full object-cover" 
           controls={isOutput}
           preload="metadata"
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onEnded={() => setIsPlaying(false)}
+          playsInline
         >
           <source src={fullVideoUrl} type="video/mp4" />
           Your browser does not support the video tag.
@@ -63,4 +71,3 @@ export default function VideoPlayer({ videoUrl, isOutput = false }: VideoPlayerP
     </div>
   )
 }
-

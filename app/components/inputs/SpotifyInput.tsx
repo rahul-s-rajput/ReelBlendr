@@ -23,6 +23,7 @@ interface MusicInputProps {
     stylePreference: string
     moodTone: string
     targetDuration: number
+    genre: string
   }
   handleInputChange: (name: string, value: string) => void
   recommendations: Track[]
@@ -82,8 +83,7 @@ export default function MusicInput({
   const isFormValid = () => {
     const requiredFields = {
       'Content Focus': formData.contentFocus,
-      'Key Labels': formData.keyLabels,
-      'Style': formData.stylePreference,
+      'Genre': formData.genre,
       'Mood': formData.moodTone
     }
 
@@ -112,8 +112,7 @@ export default function MusicInput({
 
       console.log('Sending request with data:', {
         contentFocus: formData.contentFocus,
-        keyLabels: formData.keyLabels,
-        style: formData.stylePreference,
+        genre: formData.genre,
         mood: formData.moodTone,
         duration: formData.targetDuration
       })
@@ -125,8 +124,7 @@ export default function MusicInput({
         },
         body: JSON.stringify({
           contentFocus: formData.contentFocus,
-          keyLabels: formData.keyLabels,
-          style: formData.stylePreference,
+          genre: formData.genre,
           mood: formData.moodTone,
           duration: formData.targetDuration
         }),

@@ -9,6 +9,7 @@ import io
 import sys
 from scipy.signal import find_peaks
 import json
+from difflib import SequenceMatcher
 
 class MusicRecommender:
     def __init__(self):
@@ -21,36 +22,18 @@ class MusicRecommender:
             raise
 
     def find_recommendations(self, 
-                        content_focus: str,
-                        key_labels: str,
-                        style: str,
-                        mood: str,
-                        duration: int,
-                        num_recommendations: int = 3) -> List[Dict]:
+                    content_focus: str,
+                    mood: str,
+                    genre: str,
+                    duration: int,
+                    num_recommendations: int = 3) -> List[Dict]:
         """Find music recommendations using YouTube Music"""
         try:
             # Redirect all debug prints to stderr
             def debug_print(*args, **kwargs):
                 print(*args, file=sys.stderr, flush=True, **kwargs)
-
-            # Get mood categories from YouTube Music
-            mood_categories = self.ytmusic.get_mood_categories()
             
-            # Helper function to find category params
-            def find_category_params(categories, search_terms):
-                for category_type in categories:
-                    for category in categories[category_type]:
-                        # Check if any search term matches the category title
-                        if search_terms.lower() in category['title'].lower():
-                            return category['params']
-                return None
             
-            # Get search terms based on style and mood
-            search_terms = mood
-            labels = content_focus
-            
-            # Find matching category
-            category_params = find_category_params(mood_categories, search_terms)
 
             def get_track_info(video_id: str) -> dict:
                 try:
@@ -61,111 +44,85 @@ class MusicRecommender:
                     }
                 except Exception as e:
                     return {'view_count': 0}
+            
+            final_tracks = []
+            duration_sec = duration / 1000
 
-            all_tracks = []
-            duration_sec = duration / 1000  # Convert to seconds
-            debug_print(labels)
-            debug_print(f"Category params: {category_params}")
-            if category_params:
-                # Get playlists for the category
-                playlists = self.ytmusic.get_mood_playlists(category_params)
-                debug_print(f"Found {len(playlists)} playlists")
-                
-                for playlist in playlists:
-                    try:
-                        playlist_tracks = self.ytmusic.get_playlist(playlist['playlistId'], limit=100)['tracks']
-                        
-                        for track in playlist_tracks:
-                            if not track.get('duration_seconds'):
-                                continue
-                                
-                            track_duration = track['duration_seconds']
-                            if track_duration >= duration_sec:
-                                # Check if track matches any search term
-                                debug_print(f"Checking track: {track['title']}")                 
-                                if (labels.lower() in track['title'].lower()):
-                                    # Add track if not already in list
-                                    
-                                    if not any(t['videoId'] == track['videoId'] or 
-                                             (t['name'] == track['title'] and 
-                                              t.get('duration_ms') == int(track['duration_seconds'] * 1000)) 
-                                             for t in all_tracks):
-                                        track_info = get_track_info(track['videoId'])
-                                        debug_print(f"Adding track: {track['title']}") 
-                                        all_tracks.append({
-                                            'id': track['videoId'],
-                                            'name': track['title'],
-                                            'artist': track['artists'][0]['name'] if track.get('artists') else 'Unknown',
-                                            'duration_ms': int(track_duration * 1000),
-                                            'external_url': f"https://music.youtube.com/watch?v={track['videoId']}",
-                                            'view_count': track_info['view_count'],
-                                            'videoId': track['videoId']
-                                        })
-                                        
-                            if len(all_tracks) >= num_recommendations * 2:
-                                break
-                            
-                    except Exception as e:
-                        debug_print(f"Error processing playlist: {e}")
-                        continue
-                        
-                    if len(all_tracks) >= num_recommendations * 2:
+            # First get genre tracks (since this is usually a smaller set)
+            genre_query = f"{content_focus} {genre} {mood} music" 
+            debug_print(f"Genre query: {genre_query}")
+            try:
+                genre_results = self.ytmusic.search(genre_query, filter="songs", limit=30)  # Reduced limit
+                for track in genre_results:
+                    if(track['duration_seconds'] >= duration_sec) and track['duration_seconds'] <= 3000:
+                        final_tracks.append({
+                            'id': track['videoId'],
+                            'name': track['title'],
+                            'artist': track['artists'][0]['name'] if track.get('artists') else 'Unknown',
+                            'duration_ms': int(track['duration_seconds'] * 1000),
+                            'external_url': f"https://music.youtube.com/watch?v={track['videoId']}",
+                            'view_count': get_track_info(track['videoId'])['view_count'],
+                            'videoId': track['videoId']
+                    })
+
+              
+            except Exception as e:
+                debug_print(f"Error in genre search: {e}")
+
+            # Keep track of seen tracks to avoid duplicates
+            seen_tracks = set()  # Track by name + duration combination
+
+            def is_similar_title(title1: str, title2: str, threshold: float = 0.8) -> bool:
+                """Check if two titles are similar using sequence matcher"""
+                return SequenceMatcher(None, title1.lower(), title2.lower()).ratio() >= threshold
+
+            def is_similar_duration(dur1: int, dur2: int, threshold_ms: int = 5000) -> bool:
+                """Check if two durations are within threshold milliseconds"""
+                return abs(dur1 - dur2) <= threshold_ms
+
+            # Filter out similar tracks and create final list
+            unique_tracks = []
+            for track in final_tracks:
+                # Check if we already have a similar track
+                is_duplicate = False
+                for existing_track in unique_tracks:
+                    if (
+                        # Same artist
+                        track['artist'] == existing_track['artist'] 
+                        and (
+                            # Similar title
+                            is_similar_title(track['name'], existing_track['name'])
+                            or
+                            # One title is substring of another
+                            track['name'].lower() in existing_track['name'].lower()
+                            or existing_track['name'].lower() in track['name'].lower()
+                        )
+                        and
+                        # Similar duration
+                        is_similar_duration(track['duration_ms'], existing_track['duration_ms'])
+                    ):
+                        # Keep the one with more views
+                        if track['view_count'] > existing_track['view_count']:
+                            unique_tracks.remove(existing_track)
+                            unique_tracks.append(track)
+                        is_duplicate = True
                         break
-                    
-            # If we don't have enough tracks, fall back to search
-            if len(all_tracks) < num_recommendations:
-                # Create search queries combining different terms
-                search_queries = [
-                    f"{content_focus} {term}" for term in search_terms
-                ] + [
-                    f"{key_labels} {term}" for term in search_terms
-                ] + [
-                    f"{style} {mood} music",
-                    f"{mood} background music",
-                    f"{style} background music"
-                ]
                 
-                # Search using each query
-                for query in search_queries:
-                    try:
-                        results = self.ytmusic.search(query, filter="songs", limit=20)
-                        
-                        # Filter tracks based on duration
-                        for track in results:
-                            if not track.get('duration_seconds'):
-                                continue
-                                
-                            track_duration = track['duration_seconds']
-                            if track_duration >= duration_sec:
-                                if not any(t['videoId'] == track['videoId'] for t in all_tracks):
-                                    track_info = get_track_info(track['videoId'])
-                                    all_tracks.append({
-                                        'id': track['videoId'],
-                                        'name': track['title'],
-                                        'artist': track['artists'][0]['name'] if track.get('artists') else 'Unknown',
-                                        'duration_ms': int(track_duration * 1000),
-                                        'external_url': f"https://music.youtube.com/watch?v={track['videoId']}",
-                                        'view_count': track_info['view_count'],
-                                        'videoId': track['videoId']
-                                    })
-                                    
-                    except Exception as e:
-                        debug_print(f"Error in search query '{query}': {e}")
-                        continue
-            
-            # Collect all tracks and create final response
-            if not all_tracks:
-                return []  # Return empty list if no tracks found
-            
-            # Sort by view count and return top recommendations
-            all_tracks.sort(key=lambda x: x['view_count'], reverse=True)
-            return all_tracks[:num_recommendations]
-            
+                if not is_duplicate:
+                    unique_tracks.append(track)
+
+            # Sort by view count and prioritize tracks with content_focus in title (only if views >= 1000)
+            unique_tracks.sort(key=lambda x: (
+                not (content_focus.lower() in x['name'].lower() and x['view_count'] >= 1000),
+                -x['view_count']
+            ))
+            return unique_tracks[:num_recommendations]
+
         except Exception as e:
             print(f"Error getting music recommendations: {str(e)}", file=sys.stderr, flush=True)
             return []
 
-    def find_best_section(self, y: np.ndarray, sr: int, target_duration_sec: float, mood: str) -> tuple:
+    def find_best_section(self, y: np.ndarray, sr: int, style_min: int, target_duration_sec: float, mood: str) -> tuple:
         """Find the best section of audio based on mood and transitions"""
         try:
             # Set up debug printing
@@ -180,7 +137,7 @@ class MusicRecommender:
             energy = self._calculate_energy(y, sr, hop_length)
             
             # Find transition points
-            transition_points = self._find_transition_points(onset_env, sr, hop_length)
+            transition_points = self._find_transition_points(onset_env, sr, hop_length, min_distance_seconds=style_min)
             debug_print(f"Found {len(transition_points)} transition points")
             
             # Select best segment
@@ -192,7 +149,7 @@ class MusicRecommender:
             
             if best_segment is None:
                 debug_print("No suitable segment found, falling back to default section")
-                return 0, int(target_duration_sec * sr)
+                return transition_points,0, target_duration_sec, 0, int(target_duration_sec * sr)
             
             start_time, end_time = best_segment
             debug_print(f"Start time: {start_time}, End time: {end_time}")
@@ -200,7 +157,7 @@ class MusicRecommender:
             # Ensure we have valid numbers before converting
             if not (isinstance(start_time, (int, float)) and isinstance(end_time, (int, float))):
                 debug_print(f"Invalid time values: start_time={type(start_time)}, end_time={type(end_time)}")
-                return 0, int(target_duration_sec * sr)
+                return transition_points,0, int(target_duration_sec * sr), 0, int(target_duration_sec * sr)
             
             # Convert to integers for slicing
             start_sample = int(np.floor(start_time * sr))
@@ -228,59 +185,75 @@ class MusicRecommender:
 
     def _find_transition_points(self, onset_env, sr, hop_length, min_distance_seconds=4.0):
         """Find significant transition points in the audio"""
-        threshold = 0.2 + 0.1 * np.std(onset_env)
-        prominence = 0.1 + 0.05 * np.mean(onset_env)
-        
-        # Convert min_distance to frames
-        min_distance_frames = int(min_distance_seconds * sr / hop_length)
-        
-        # Detect peaks
-        peaks, _ = find_peaks(onset_env, height=threshold, prominence=prominence)
-        peaks_in_seconds = peaks * hop_length / sr
-        
-        # Filter and calculate significance
-        filtered_peaks = []
-        last_peak_time = 0
-        
-        while last_peak_time < peaks_in_seconds[-1]:
-            search_start = last_peak_time + min_distance_seconds
-            search_end = search_start + min_distance_seconds
-            
-            peaks_in_range = [
-                p for p in range(len(peaks)) 
-                if search_start <= peaks_in_seconds[p] < search_end
-            ]
-            
-            if peaks_in_range:
-                peaks_with_significance = []
-                for p in peaks_in_range:
-                    peak = peaks[p]
-                    current_value = onset_env[peak]
-                    previous_value = onset_env[peak - 1] if peak > 0 else 0
-                    next_value = onset_env[peak + 1] if peak < len(onset_env) - 1 else 0
-                    significance = max(abs(current_value - previous_value), abs(current_value - next_value))
-                    peaks_with_significance.append((peak, significance))
-                
-                most_significant_peak = max(peaks_with_significance, key=lambda x: x[1])[0]
-                filtered_peaks.append(most_significant_peak)
-                last_peak_time = peaks_in_seconds[np.where(peaks == most_significant_peak)[0][0]]
-            else:
-                last_peak_time += min_distance_seconds
-        
-        # Calculate final significances
+        max_retries = 4
+        retry_count = 0
         transition_points = []
-        for peak in filtered_peaks:
-            current_value = onset_env[peak]
-            previous_value = onset_env[peak - 1] if peak > 0 else 0
-            next_value = onset_env[peak + 1] if peak < len(onset_env) - 1 else 0
-            significance = max(abs(current_value - previous_value), abs(current_value - next_value))
-            time = peak * hop_length / sr
-            transition_points.append((time, significance))
         
+        def debug_print(*args, **kwargs):
+            print(*args, file=sys.stderr, flush=True, **kwargs)
+        
+        while retry_count < max_retries and not transition_points:
+            # Reduce threshold and prominence by 10% on each retry
+            reduction_factor = 1.0 - (retry_count * 0.25)
+            threshold = (0.2 + 0.1 * np.std(onset_env)) * reduction_factor
+            prominence = (0.1 + 0.05 * np.mean(onset_env)) * reduction_factor
+            debug_print(f"Attempt {retry_count + 1}: threshold={threshold:.4f}, prominence={prominence:.4f}")
+            # Detect peaks
+            peaks, _ = find_peaks(onset_env, height=threshold, prominence=prominence)
+            peaks_in_seconds = peaks * hop_length / sr
+            
+            debug_print(f"Found {len(peaks)} initial peaks")
+            
+            if len(peaks) == 0:
+                retry_count += 1
+                continue
+            
+            # Rest of the existing logic remains the same
+            filtered_peaks = []
+            last_peak_time = 0
+            
+            while last_peak_time < peaks_in_seconds[-1]:
+                search_start = last_peak_time + min_distance_seconds
+                search_end = search_start + min_distance_seconds
+                
+                peaks_in_range = [
+                    p for p in range(len(peaks)) 
+                    if search_start <= peaks_in_seconds[p] < search_end
+                ]
+                
+                if peaks_in_range:
+                    peaks_with_significance = []
+                    for p in peaks_in_range:
+                        peak = peaks[p]
+                        current_value = onset_env[peak]
+                        previous_value = onset_env[peak - 1] if peak > 0 else 0
+                        next_value = onset_env[peak + 1] if peak < len(onset_env) - 1 else 0
+                        significance = max(abs(current_value - previous_value), abs(current_value - next_value))
+                        peaks_with_significance.append((peak, significance))
+                    
+                    most_significant_peak = max(peaks_with_significance, key=lambda x: x[1])[0]
+                    filtered_peaks.append(most_significant_peak)
+                    last_peak_time = peaks_in_seconds[np.where(peaks == most_significant_peak)[0][0]]
+                else:
+                    last_peak_time += min_distance_seconds
+            
+            # Calculate final significances
+            transition_points = []
+            for peak in filtered_peaks:
+                current_value = onset_env[peak]
+                previous_value = onset_env[peak - 1] if peak > 0 else 0
+                next_value = onset_env[peak + 1] if peak < len(onset_env) - 1 else 0
+                significance = max(abs(current_value - previous_value), abs(current_value - next_value))
+                time = peak * hop_length / sr
+                transition_points.append((time, significance))
+            
+            if not transition_points:
+                retry_count += 1
+            
         return transition_points
 
     def _select_smooth_segment(self, onset_env, energy, sr, hop_length, transition_points, 
-                             mood, duration, min_transitions=4):
+                             mood, duration, min_transitions=2):
         """Select a smooth segment based on mood and transitions"""
         segment_length_samples = duration * sr
         hop_per_second = sr // hop_length
@@ -367,7 +340,7 @@ class MusicRecommender:
         )
 
 
-    def get_audio_analysis(self, track_name: str, artist: str, target_duration: int, mood: str) -> Dict:
+    def get_audio_analysis(self, track_name: str, artist: str, style: str, target_duration: int, mood: str) -> Dict:
         """Get audio analysis using librosa"""
         def debug_print(*args, **kwargs):
             print(*args, file=sys.stderr, flush=True, **kwargs)
@@ -413,6 +386,11 @@ class MusicRecommender:
             }
             
             try:
+                style_min = {
+                    "Smooth/Cinematic": 4,
+                    "Fast-paced": 2,
+                    "Documentary": 7
+                }
                 # Download the audio
                 with YoutubeDL(ydl_opts) as ydl:
                     print(f"Downloading audio from video ID: {video_id}")
@@ -421,9 +399,9 @@ class MusicRecommender:
                 # Load and analyze the audio
                 y, sr = librosa.load(temp_file, sr=None)
                 target_duration_sec = target_duration / 1000
-                
+                print(f"Style min: {style_min[style]}")
                 # Find the best section based on mood
-                transition_points, start_time, end_time, start_sample, end_sample = self.find_best_section(y, sr, target_duration_sec, mood)
+                transition_points, start_time, end_time, start_sample, end_sample = self.find_best_section(y, sr, style_min[style], target_duration_sec, mood)
                 
                 # Extract and save the selected section
                 y_section = y[start_sample:end_sample]
@@ -542,15 +520,14 @@ if __name__ == "__main__":
     try:
         # Get input from command line
         input_data = json.loads(sys.argv[1])
-        
+        print(input_data, file=sys.stderr, flush=True)
         # Initialize recommender
         recommender = MusicRecommender()
         
         # Get recommendations
         recommendations = recommender.find_recommendations(
             input_data['contentFocus'],
-            input_data['keyLabels'],
-            input_data['style'],
+            input_data['genre'],
             input_data['mood'],
             input_data['duration']
         )

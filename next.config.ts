@@ -15,8 +15,6 @@ const nextConfig: NextConfig = {
     domains: ['localhost'],
     unoptimized: true
   },
-  // Reduce development overhead
-  swcMinify: true,
   poweredByHeader: false
 }
 
