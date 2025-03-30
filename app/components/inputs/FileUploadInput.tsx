@@ -59,7 +59,7 @@ export default function FileUploadInput({ label, name, value, onChange }: FileUp
     <div className="space-y-4">
       <Label className="text-purple-400 flex items-center">
         {label}
-        <span className="text-red-400 ml-1">*</span>
+        <span className="text-purple-400 ml-1">*</span>
       </Label>
       <div
         {...getRootProps()}

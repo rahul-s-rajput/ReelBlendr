@@ -15,7 +15,14 @@ const nextConfig: NextConfig = {
     domains: ['localhost'],
     unoptimized: true
   },
-  poweredByHeader: false
+  poweredByHeader: false,
+  // Disable error overlay
+  onError: () => {},
+  // Disable React DevTools in production
+  devIndicators: {
+    buildActivity: false,
+    buildActivityPosition: 'bottom-right',
+  }
 }
 
 export default nextConfig

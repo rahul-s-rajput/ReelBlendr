@@ -30,8 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +40,44 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python backend
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.env
+.cache
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Media files that should not be versioned
+*.mp3
+*.mp4
+*.wav
+*.avi
+*.mov
+*.webm
+
+# Credentials and secrets
+*credentials*.json
+*secret*.json
+*api_key*
+
+# Generated data
+/backend/data/temp/
+/backend/data/output/
+/backend/data/downloads/
+
+# Specific files
+african.txt
+chill.txt
+backend/test.json
+backend/data/video_analysis_results1.json
+backend/data/*.json

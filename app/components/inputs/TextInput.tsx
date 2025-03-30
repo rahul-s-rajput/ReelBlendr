@@ -1,8 +1,9 @@
 import { Input } from '../../ui/input'
 import { Label } from '../../ui/label'
+import { ReactNode } from 'react'
 
 interface TextInputProps {
-  label: string
+  label: ReactNode
   name: string
   value: string
   onChange: (name: string, value: string) => void

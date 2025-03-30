@@ -14,6 +14,7 @@ import SpotifyInput from './inputs/SpotifyInput'
 import VideoPlayer from './VideoPlayer'
 import LoadingAnimation from './LoadingAnimation'
 import LoadingOverlay from './LoadingOverlay'
+import { Wand2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 interface Track {
@@ -193,11 +194,11 @@ export default function VideoCreationForm() {
       errors.targetDuration = 'Duration must be between 5 and 300 seconds';
     }
 
-    if (!formData.contentFocus) {
+    if (!formData.contentFocus.trim()) {
       errors.contentFocus = 'Content focus is required';
     }
 
-    if (!formData.keyLabels) {
+    if (!formData.keyLabels.trim()) {
       errors.keyLabels = 'Key labels are required';
     }
 
@@ -209,12 +210,13 @@ export default function VideoCreationForm() {
       errors.moodTone = 'Mood/tone is required';
     }
 
-    if (formData.audioOption === 'spotify' && !formData.spotifyTrack) {
-      errors.spotifyTrack = 'Please select a Spotify track';
-    }
-
     if (!formData.uploadedVideos || formData.uploadedVideos.length === 0) {
       errors.uploadedVideos = 'Please upload at least one video';
+    }
+
+    // Add validation for music link when audio option is "Use Selected Track"
+    if (formData.audioOption === 'Use Selected Track' && !formData.spotifyTrack) {
+      errors.spotifyTrack = 'Please select a music track';
     }
 
     return errors;
@@ -246,9 +248,9 @@ export default function VideoCreationForm() {
             <form onSubmit={handleSubmit}>
               <Tabs defaultValue="upload" className="w-full">
                 <TabsList className="grid w-full grid-cols-3 mb-6">
-                  <TabsTrigger value="upload">Upload</TabsTrigger>
-                  <TabsTrigger value="style">Style</TabsTrigger>
-                  <TabsTrigger value="audio">Audio</TabsTrigger>
+                  <TabsTrigger value="upload" className="hover:bg-purple-400 transition-colors duration-200">Upload</TabsTrigger>
+                  <TabsTrigger value="style" className="hover:bg-purple-400 transition-colors duration-200">Style</TabsTrigger>
+                  <TabsTrigger value="audio" className="hover:bg-purple-400 transition-colors duration-200">Audio</TabsTrigger>
                 </TabsList>
                 <TabsContent value="upload" className="space-y-6">
                   <FileUploadInput
@@ -258,7 +260,7 @@ export default function VideoCreationForm() {
                     onChange={handleInputChange}
                   />
                   <NumberInput
-                    label="Target Duration (seconds)"
+                    label={<span className="text-purple-400 flex items-center text-sm font-medium tracking-wide">Target Duration (seconds)</span>}
                     name="targetDuration"
                     value={formData.targetDuration}
                     onChange={handleInputChange}
@@ -269,7 +271,7 @@ export default function VideoCreationForm() {
                 </TabsContent>
                 <TabsContent value="style" className="space-y-6">
                   <TextInput
-                    label="Content Focus"
+                    label={<span className="text-purple-400 flex items-center text-sm font-medium tracking-wide">Content Focus<span className="ml-1">*</span></span>}
                     name="contentFocus"
                     value={formData.contentFocus}
                     onChange={handleInputChange}
@@ -277,7 +279,9 @@ export default function VideoCreationForm() {
                     required
                   />
                   <TextInput
-                    label="Key Labels & Emphasis"
+                    label={<span className="text-purple-400 flex items-center text-sm font-medium tracking-wide">
+                      Key Labels<span className="ml-1">*</span>
+                    </span>}
                     name="keyLabels"
                     value={formData.keyLabels}
                     onChange={handleInputChange}
@@ -285,7 +289,7 @@ export default function VideoCreationForm() {
                     required
                   />
                   <StyleSelector
-                    label="Style Preference"
+                    label={<span className="text-purple-400 flex items-center text-sm font-medium tracking-wide">Style Preference</span>}
                     name="stylePreference"
                     value={formData.stylePreference}
                     onChange={handleInputChange}
@@ -293,7 +297,7 @@ export default function VideoCreationForm() {
                   />
 
                   <DropdownInput
-                    label="Order Preference"
+                    label={<span className="text-purple-400 flex items-center text-sm font-medium tracking-wide">Order Preference</span>}
                     name="orderPreference"
                     value={formData.orderPreference}
                     onChange={handleInputChange}
@@ -302,14 +306,14 @@ export default function VideoCreationForm() {
                 </TabsContent>
                 <TabsContent value="audio" className="space-y-6">
                 <DropdownInput
-                    label="Music Mood"
+                    label={<span className="text-purple-400 flex items-center text-sm font-medium tracking-wide">Music Mood</span>}
                     name="moodTone"
                     value={formData.moodTone}
                     onChange={handleInputChange}
                     options={["Calm", "Chill", "Commute", "Energy Boosters", "Feel Good", "Party", "Romance", "Sad", "Workout"]}
                   />
                   <DropdownInput
-                    label="Music Genre"
+                    label={<span className="text-purple-400 flex items-center text-sm font-medium tracking-wide">Music Genre</span>}
                     name="genre"
                     value={formData.genre}
                     onChange={handleInputChange}
@@ -338,8 +342,13 @@ export default function VideoCreationForm() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button type="submit" className="w-64 h-12 bg-gradient-to-r from-coral to-electric-blue hover:from-coral-dark hover:to-electric-blue-dark text-white text-lg font-semibold rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105" disabled={isProcessing}>
-                        {isProcessing ? <LoadingAnimation /> : 'Create Reel'}
+                      <Button type="submit" className="w-64 h-12 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white text-lg font-semibold rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center" disabled={isProcessing || Object.keys(validateForm()).length > 0}>
+                      {isProcessing ? (
+                        <span className="animate-spin mr-2">🎬</span>
+                      ) : (
+                        <Wand2 className="mr-2" />
+                      )}
+                      {isProcessing ? 'Blending Magic...' : 'Create Reel'}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
