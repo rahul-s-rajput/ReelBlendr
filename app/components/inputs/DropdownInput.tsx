@@ -1,8 +1,9 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select'
 import { Label } from '../../ui/label'
+import { ReactNode } from 'react'
 
 interface DropdownInputProps {
-  label: string
+  label: ReactNode
   name: string
   value: string
   onChange: (name: string, value: string) => void

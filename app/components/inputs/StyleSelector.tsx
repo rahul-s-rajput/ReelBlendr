@@ -1,8 +1,9 @@
 import { Label } from '../../ui/label'
 import { Button } from '../../ui/button'
+import { ReactNode } from 'react'
 
 interface StyleSelectorProps {
-  label: string
+  label: ReactNode
   name: string
   value: string
   onChange: (name: string, value: string) => void

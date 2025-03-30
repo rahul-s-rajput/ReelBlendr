@@ -61,7 +61,7 @@ export default function VideoPlayer({ videoUrl, isOutput = false }: VideoPlayerP
       </div>
       <div className="flex justify-center">
         <Button
-          className="mt-4 bg-coral hover:bg-coral-dark text-white px-6 py-3 rounded-full flex items-center space-x-2"
+          className="w-64 h-12 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white text-lg font-semibold rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center"
           onClick={() => window.open(fullVideoUrl, '_blank')}
         >
           <Download className="h-5 w-5" />

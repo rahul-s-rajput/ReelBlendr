@@ -159,9 +159,9 @@ export default function MusicInput({
   return (
     <div className={`space-y-4 ${isLoading ? 'pointer-events-none opacity-50' : ''}`}>
       <div>
-        <Label className="text-[#374151] flex items-center text-lg font-bold tracking-wide">
+        <Label className="text-purple-400 flex items-center text-lg font-bold tracking-wide">
           Music Track Link
-          <span className="text-red-400 ml-1">*</span>
+          <span className="text-purple-400 ml-1">*</span>
         </Label>
         <Input
           type="text"
@@ -208,59 +208,49 @@ export default function MusicInput({
         <div>
           <Label className="text-purple-400 flex items-center gap-2 text-xl font-bold mb-3 tracking-wide">
             Recommended Tracks
-            <span className="text-base font-semibold">({recommendations.length})</span>
           </Label>
-          <div className="mt-2 space-y-3">
-            {recommendations.map((track) => (
-              <div 
-                key={track.id}
-                className="bg-white/20 backdrop-blur-sm rounded-lg p-4 hover:bg-white/30 
-                         transition-all duration-300 border border-purple-300/20"
-              >
-                <div className="flex justify-between items-center gap-4">
-                  <div className="flex-1">
-                    <h3 className="text-purple-400 font-semibold text-lg">{track.name}</h3>
-                    <p className="text-purple-400 text-sm font-medium">{track.artist}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-purple-100 text-xs bg-purple-900/50 px-2 py-1 rounded-full">
-                        Duration: {Math.floor(track.duration_ms / 1000)}s
-                      </span>
-                      <span className="text-purple-100 text-xs bg-purple-900/50 px-2 py-1 rounded-full">
-                        View Count: {track.view_count}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2 min-w-[200px]">
-                    <iframe
-                      src={`https://www.youtube.com/embed/${track.videoId}?controls=1&showinfo=0&rel=0&modestbranding=1&color=white&iv_load_policy=3&playsinline=1&enablejsapi=1`}
-                      width="100%"
-                      height="60"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      loading="lazy"
-                      className="rounded-md bg-black/20"
-                      style={{
-                        maxWidth: '100%',
-                        border: 'none',
-                      }}
-                    />
-                    <Button
-                      size="sm"
-                      variant="default"
-                      onClick={(e) => {
-                        e.preventDefault()  // Prevent form submission
-                        e.stopPropagation()  // Stop event bubbling
-                        handleTrackSelect(track)
-                      }}
-                      className="text-sm font-medium bg-purple-600 hover:bg-purple-700 
-                               text-white transition-all duration-300"
-                    >
-                      Select
-                    </Button>
+          <div className="mt-2 grid grid-cols-2 gap-4">
+            {/* Left Column - Track List */}
+            <div className="space-y-3">
+              {recommendations.map((track) => (
+                <div 
+                  key={track.id}
+                  onClick={() => handleTrackSelect(track)}
+                  className="bg-white/20 backdrop-blur-sm rounded-lg p-4 
+                             hover:bg-purple-900 hover:bg-opacity-25 hover:border-purple-400
+                             transition-all duration-300 border border-purple-300/20 cursor-pointer"
+                >
+                  <h3 className="text-purple-400 font-semibold text-lg">{track.name}</h3>
+                  <p className="text-purple-400 text-sm font-medium">{track.artist}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-purple-100 text-xs bg-purple-900/50 px-2 py-1 rounded-full">
+                      Duration: {Math.floor(track.duration_ms / 60000)}:{String(Math.floor((track.duration_ms % 60000) / 1000)).padStart(2, '0')}
+                    </span>
+                    <span className="text-purple-100 text-xs bg-purple-900/50 px-2 py-1 rounded-full">
+                      Views: {track.view_count.toLocaleString()}
+                    </span>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            {/* Right Column - YouTube Player */}
+            <div className="sticky top-4">
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 border border-purple-300/20">
+                <iframe
+                  src={`https://www.youtube.com/embed/${value ? value.split('v=')[1] : recommendations[0]?.videoId}?controls=1&showinfo=0&rel=0&modestbranding=1&color=white&iv_load_policy=3&playsinline=1&enablejsapi=1`}
+                  width="100%"
+                  height="315"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  loading="lazy"
+                  className="rounded-md bg-black/20 w-full"
+                  style={{
+                    border: 'none',
+                  }}
+                />
               </div>
-            ))}
+            </div>
           </div>
         </div>
       )}

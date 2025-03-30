@@ -1,9 +1,10 @@
 import { Input } from '../../ui/input'
 import { Label } from '../../ui/label'
 import { Slider } from '../../ui/slider'
+import { ReactNode } from 'react'
 
 interface NumberInputProps {
-  label: string
+  label: ReactNode
   name: string
   value: number
   onChange: (name: string, value: number) => void

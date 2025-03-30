@@ -7,7 +7,6 @@ import { useState, useEffect } from 'react'
 
 export default function Home() {
   const [outputVideoUrl, setOutputVideoUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
@@ -30,10 +29,6 @@ export default function Home() {
       console.error('Error:', error);
     }
   };
-
-  useEffect(() => {
-    setLoading(true);
-  }, []);
 
   return (
     <main className="min-h-screen relative overflow-hidden">
