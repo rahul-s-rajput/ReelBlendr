@@ -94,11 +94,12 @@ export default function VideoCreationForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsProcessing(true);
-    setLoadingMessage('Creating your video...');
+    // Reset state before starting a new request
     setError('');
     setShowError(false);
-    setGeneratedVideoUrl('');
+    setGeneratedVideoUrl(''); // Clear previous video URL
+    setIsProcessing(true);
+    setLoadingMessage('Creating your video...');
 
     try {
       // Debug log to check the files
@@ -120,11 +121,15 @@ export default function VideoCreationForm() {
       // Log the files being sent
       console.log('Sending files:', formData.uploadedVideos);
       
+      // Check if videos are already in state (indicating potential reuse)
+      const videosExistInState = formData.uploadedVideos && formData.uploadedVideos.length > 0;
+
       Object.entries(formData).forEach(([key, value]) => {
         if (key === 'uploadedVideos' && Array.isArray(value)) {
-          value.forEach((file: File) => {
-            formDataToSend.append('videos', file);
-          });
+           value.forEach((file: File) => {
+             formDataToSend.append('videos', file); // Append original File object
+           });
+           console.log("Sending original File objects."); // Reverted log message
         } else {
           formDataToSend.append(key, value.toString());
         }
@@ -136,6 +141,8 @@ export default function VideoCreationForm() {
       const response = await fetch('/api/create-video', {
         method: 'POST',
         body: formDataToSend,
+        cache: 'no-store', // Explicitly disable caching for this request
+        keepalive: false // Explicitly set keepalive to false
       });
 
       const data = await response.json()
@@ -373,4 +380,3 @@ export default function VideoCreationForm() {
     </div>
   )
 }
-

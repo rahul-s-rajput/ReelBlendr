@@ -112,9 +112,9 @@ class VideoProcessor:
             # Add remaining video settings
             command.extend([
                 '-force_key_frames', 'expr:gte(t,n_forced*2)',
-                '-c:v', 'libx264',
-                '-preset', 'ultrafast',
-                '-pix_fmt', 'yuv420p',
+                '-c:v', 'h264_nvenc', # Use NVIDIA hardware encoder
+                '-preset', 'p1', # Use fastest NVENC preset (p1=fastest, p7=slowest/best quality)
+                '-pix_fmt', 'yuv420p', # Keep pixel format, often compatible
                 '-r', '30000/1001',
                 '-video_track_timescale', '30000',
                 '-movflags', '+faststart',
@@ -147,4 +147,4 @@ class VideoProcessor:
         
         if result.returncode != 0:
             print(f"FFmpeg error: {result.stderr}")
-            raise Exception(f"FFmpeg error: {result.stderr}") 
+            raise Exception(f"FFmpeg error: {result.stderr}")
