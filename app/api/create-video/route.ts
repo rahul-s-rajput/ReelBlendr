@@ -24,7 +24,10 @@ export async function POST(request: Request) {
     try {
       const response = await fetch('http://127.0.0.1:5000/api/create-video', {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: { // Add headers
+          'Connection': 'close' // Explicitly close connection after request
+        }
       })
 
       if (!response.ok) {
@@ -41,65 +44,89 @@ export async function POST(request: Request) {
       let videoUrl: string | null = null
       let lastError: string | null = null
 
-      // Stream the response
-      while (true) {
-        const { done, value } = await reader.read()
-        
-        if (done) {
-          if (videoUrl) {
-            return NextResponse.json({
-              status: 'success',
-              video_url: videoUrl
-            })
-          } else if (lastError) {
-            throw new Error(lastError)
-          }
-          break
-        }
+      try { // Wrap stream processing in try...finally
+        // Stream the response
+        while (true) {
+          const { done, value } = await reader.read()
 
-        const chunk = decoder.decode(value)
-        const lines = chunk.split('\n\n')
-        
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const eventData = JSON.parse(line.slice(6))
-              
-              switch (eventData.type) {
-                case 'complete':
-                  videoUrl = eventData.video_url
-                  break
-                case 'error':
-                  lastError = eventData.message
-                  break
-                case 'end':
-                  if (videoUrl) {
-                    return NextResponse.json({
-                      status: 'success',
-                      video_url: videoUrl
-                    })
-                  } else if (lastError) {
-                    throw new Error(lastError)
-                  }
-                  break
-                case 'progress':
-                  console.log('Progress:', eventData.message)
-                  break
+          if (done) {
+             // Exit loop when stream is done
+             break
+          }
+
+          const chunk = decoder.decode(value)
+          const lines = chunk.split('\n\n')
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const eventData = JSON.parse(line.slice(6))
+
+                switch (eventData.type) {
+                  case 'complete':
+                    videoUrl = eventData.video_url
+                    // Don't return/break immediately, let stream finish naturally
+                    break
+                  case 'error':
+                    lastError = eventData.message
+                    // Optionally break here if errors should halt processing immediately
+                    break
+                  case 'end':
+                    // The 'end' message signals the backend finished.
+                    // We rely on the reader's 'done' flag to exit the loop.
+                    // No specific action needed here, loop will terminate when done=true.
+                    break
+                  case 'progress':
+                    console.log('Progress:', eventData.message)
+                    break
+                }
+              } catch (parseError) {
+                console.error('Error parsing SSE data:', parseError)
+                lastError = `Error parsing stream data: ${parseError instanceof Error ? parseError.message : parseError}`;
+                // Optionally break here if parsing errors are critical
               }
-            } catch (parseError) {
-              console.error('Error parsing SSE data:', parseError)
             }
           }
+        } // End while loop
+
+        // After loop finishes (because reader signaled done=true)
+        if (videoUrl) {
+          // Success case: return the video URL
+          return NextResponse.json({
+            status: 'success',
+            video_url: videoUrl
+          })
+        } else if (lastError) {
+          // Error case: Return JSON error response
+          console.error("Stream processing finished with error:", lastError);
+          // Throwing here might prevent finally block execution in some edge cases?
+          // Let's return a JSON error response directly.
+          // throw new Error(lastError)
+           return NextResponse.json({ status: 'error', message: lastError }, { status: 500 });
+        } else {
+          // Unexpected case: stream finished without complete or error message
+           console.error('Stream ended without explicit completion or error message.');
+           return NextResponse.json({ status: 'error', message: 'Stream ended without explicit completion or error message.' }, { status: 500 });
+          // throw new Error('Stream ended without explicit completion or error message.')
+        }
+
+      } finally {
+        // Ensure the reader lock is always released
+        if (reader) {
+          try {
+            await reader.releaseLock();
+            console.log("Stream reader released.");
+          } catch (releaseError) {
+            console.error("Error releasing stream reader lock:", releaseError);
+          }
         }
       }
+      // The logic below this point was duplicated in the previous error and is removed by this replacement.
 
-      if (!videoUrl && !lastError) {
-        throw new Error('Stream ended without completion')
-      }
-
-    } catch (fetchError: any) {
-      console.error('Connection error:', fetchError)
-      const errorMessage = fetchError.code === 'UND_ERR_BODY_TIMEOUT' 
+    } catch (streamOrFetchError: any) { // Catch errors from fetch OR errors thrown within the stream try block
+      console.error('Error during fetch or stream processing:', streamOrFetchError);
+      // Handle specific fetch errors if needed, otherwise return generic error
+      const errorMessage = streamOrFetchError.code === 'UND_ERR_BODY_TIMEOUT'
         ? 'Video processing is taking longer than expected...'
         : 'Could not connect to video processing server. Please ensure the server is running.'
       
@@ -116,4 +143,4 @@ export async function POST(request: Request) {
       message: error instanceof Error ? error.message : 'Failed to process request'
     }, { status: 500 })
   }
-} 
+}
