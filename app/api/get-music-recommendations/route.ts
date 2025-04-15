@@ -1,4 +1,4 @@
-import { spawn } from 'child_process'
+import { spawn, ChildProcess } from 'child_process'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request): Promise<Response> {
@@ -6,8 +6,11 @@ export async function POST(request: Request): Promise<Response> {
     const data = await request.json()
     console.log('Received request data:', data)
     
-    const process = spawn(
-      'C:\\Users\\rajpu\\Downloads\\AI Project\\iter 2\\venv\\Scripts\\python.exe',
+    // Use environment variable for Python path, fallback to 'python'
+    const pythonExecutable: string = global.process.env.PYTHON_EXECUTABLE || 'python';
+    
+    const process: ChildProcess = spawn(
+      pythonExecutable,
       [
         'backend/music_recommender.py',
         JSON.stringify({
@@ -23,16 +26,16 @@ export async function POST(request: Request): Promise<Response> {
       let result = ''
       let errorOutput = ''
       
-      process.stdout.on('data', (data) => {
+      process.stdout?.on('data', (data: Buffer) => {
         result += data.toString()
       })
       
-      process.stderr.on('data', (data) => {
+      process.stderr?.on('data', (data: Buffer) => {
         errorOutput += data.toString()
         console.error('Python stderr:', data.toString())
       })
       
-      process.on('close', (code) => {
+      process.on('close', (code: number | null) => {
         if (code !== 0) {
           resolve(NextResponse.json({
             success: false,
@@ -76,4 +79,4 @@ export async function POST(request: Request): Promise<Response> {
       error: 'Failed to get music recommendations'
     }, { status: 500 })
   }
-} 
+}
